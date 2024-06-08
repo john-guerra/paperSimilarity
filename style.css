@@ -1,0 +1,6 @@
+.papers-table table {
+  width: 100%
+}
+.papers-table table td {
+  white-space: normal;
+}
