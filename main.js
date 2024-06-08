@@ -123,7 +123,7 @@ const notebookRecommendations = new Runtime().module(
 // ];
 
 let papers = [],
-  recommendations = [],
+  // recommendations = [],
   viewof_method = await notebookPaperSearch.value("viewof method");
 
 const queryEle = document.getElementById("query");
@@ -132,6 +132,9 @@ const queryForm = document.getElementById("queryForm");
 async function getData() {
   const query = queryEle.value;
   console.log("get Data", query);
+
+  // Clean up first for better experience
+  notebookPaperSearch.redefine("papers", []);
 
   papers = (
     await fetch(
