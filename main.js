@@ -84,6 +84,11 @@ const notebookRecommendations = new Runtime().module(
       return new Inspector(
         document.querySelector("#observablehq-viewof-selectionType-ee0d7845")
       );
+    if (name === "viewof selectionTarget")
+      return new Inspector(
+        document.querySelector("#observablehq-viewof-selectionTarget-ee0d7845")
+      );
+
     return [
       "url",
       "papers",
@@ -156,16 +161,12 @@ async function redraw() {
   // notebookPaperSearch.redefine("similarity", recommendations.score2[viewof_method.value]);
   notebookPaperSearch.redefine("papers", papers);
 
-  const viewof_paperSearchTable = await notebookPaperSearch.value("viewof paperSearchTable");
-  
-  viewof_paperSearchTable.removeEventListener(
-    "input",
-    onPaperChange
+  const viewof_paperSearchTable = await notebookPaperSearch.value(
+    "viewof paperSearchTable"
   );
-  viewof_paperSearchTable.addEventListener(
-    "input",
-    onPaperChange
-  );
+
+  viewof_paperSearchTable.removeEventListener("input", onPaperChange);
+  viewof_paperSearchTable.addEventListener("input", onPaperChange);
 }
 
 queryForm.addEventListener("submit", (evt) => {
