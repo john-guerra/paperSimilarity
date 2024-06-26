@@ -17,15 +17,15 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/">Search papers</a>
         </li>
+        <!-- <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/recPapers/">Recommend papers</a>
+        </li> -->
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/recPapers">Recommended papers</a>
+          <a class="nav-link active" aria-current="page" href="/authors/">Search authors</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/authors">Search authors</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/recAuthors">Recommended authors</a>
-        </li>
+        <!-- <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/recAuthors/">Recommended authors</a>
+        </li> -->
       </ul>
     </div>
   </div>

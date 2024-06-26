@@ -11,7 +11,7 @@ export async function addMoreLikeButton(notebook) {
       evt.preventDefault();
       evt.stopPropagation();
       console.log("More like this", CorpusId);
-      goto(`/recPapers/${CorpusId}`);
+      goto(`/recPapers?corpusId=${CorpusId}`);
     });
     return btn;
   };

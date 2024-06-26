@@ -13,10 +13,14 @@
             <a href="https://github.com/kwchurch">GitHub</a>
           </li>
           <li class="nav-item">
-            <a href="https://www.youtube.com/watch?v=jE49IreXs2U">Final Report (YouTube)</a>
+            <a href="https://www.youtube.com/watch?v=jE49IreXs2U"
+              >Final Report (YouTube)</a
+            >
           </li>
           <li class="nav-item">
-            <a href="https://jsalt2023.univ-lemans.fr/en/index.html">JSALT-2023</a>
+            <a href="https://jsalt2023.univ-lemans.fr/en/index.html"
+              >JSALT-2023</a
+            >
           </li>
           <li class="nav-item">
             <a href="mailto:k.church@northeastern.edu?subject=Better Together"
@@ -36,10 +40,15 @@
         ><img
           height="100"
           src="https://assets-global.website-files.com/657141b092d019b05ff57885/657141b092d019b05ff578d4_EAI_Wordmark_Dark.webp"
+          alt="EAI Logo"
         /></a
       >
       <a href="https://jsalt2023.univ-lemans.fr/en/index.html"
-        ><img height="150" src="https://jsalt2023.univ-lemans.fr/_resource/Logo/logo-haut.png" /></a
+        ><img
+          height="150"
+          src="https://jsalt2023.univ-lemans.fr/_resource/Logo/logo-haut.png"
+          alt="JSALT Logo"
+        /></a
       >
     </p>
   </div>
