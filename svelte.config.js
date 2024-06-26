@@ -2,6 +2,7 @@ import adapter from "@sveltejs/adapter-static";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
+  paths: { base: "/viz/paperSimilarity" },
   kit: {
     adapter: adapter({
       // default options are shown. On some platforms
@@ -12,9 +13,6 @@ const config = {
       precompress: false,
       strict: true,
     }),
-    prerender: {
-      handleHttpError: "warn",
-    },
   },
 };
 

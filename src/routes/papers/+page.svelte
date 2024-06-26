@@ -17,10 +17,10 @@
   let notebookPaperSearch, queryEle, queryForm, viewof_method;
   
   function setQueryUrl(q) {
-    // $page.url.searchParams.set("q", q);
+    $page.url.searchParams.set("q", q);
     // shallow routing
     // replaceState($page.url.href);
-    // goto($page.url.href);
+    goto($page.url.href);
   }
   
 
@@ -36,15 +36,10 @@
             "#observablehq-viewof-paperSearchTable-ee0d7845"
           )
         );
-      if (name === "viewof method")
-        return new Inspector(
-          document.querySelector("#observablehq-viewof-method-ee0d7845")
-        );
-      // if (name === "viewof selected")
-      //   return new Inspector(document.querySelector("#observablehq-viewof-selected-ee0d7845"));
-
-      // if (name === "viewof selectionType")
-      //   return new Inspector(document.querySelector("#observablehq-viewof-selectionType-ee0d7845"));
+      // if (name === "viewof method")
+      //   return new Inspector(
+      //     document.querySelector("#observablehq-viewof-method-ee0d7845")
+      //   );
       return ["papersUrl", "url", "papers", "tableFormat", "papers"].includes(
         name
       );
@@ -122,7 +117,7 @@
 
     <!-- <div id="observablehq-viewof-query-ee0d7845"></div> -->
 
-    <div id="observablehq-viewof-method-ee0d7845"></div>
+    <!-- <div id="observablehq-viewof-method-ee0d7845"></div> -->
 
     <h2>Papers found</h2>
     <div>Please select one to find recommendations</div>
