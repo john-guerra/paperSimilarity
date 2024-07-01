@@ -1,7 +1,14 @@
+<script>
+  import { goto } from "$app/navigation";
+  import { base } from "$app/paths";
+
+  // import { browser } from "$app/environment";
+  // if (browser) {
+  //   goto(`${base}/papers`);
+  // }
+</script>
+
 <!-- Would be redirected to /authors  -->
 
-You should be redirected to <a href="./papers">search papers</a>
+Please start on <a class="btn btn-primary" href="{base}/papers">search papers</a> or <a class="btn btn-primary" href="{base}/authors">search authors</a>
 
-<style>
-  
-</style>

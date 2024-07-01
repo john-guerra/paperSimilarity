@@ -3,7 +3,6 @@
   import Footer from "../Footer.svelte";
 
   import "../style.css";
-  
 </script>
 
 <NavBar />

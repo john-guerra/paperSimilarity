@@ -1,32 +1,33 @@
 <script>
   export let data = [];
-  export let columns = data.length === 0 ? [] : Object.keys(data[0]);
+
+  export let columns = data?.length ? Object.keys(data[0]) : [];
   export let tableFormat = {};
+  console.log("Table data: ", data, columns, tableFormat);
 </script>
 
-{data.length} rows
-<br />
-Columns {columns} columns TableFormat {JSON.stringify(tableFormat)}
+{#if !data.length}
+  <div>No data to show</div>
+{:else}
+  <table class="table">
+    <thead>
+      <tr>
+        {#each columns as c}
+          <th scope="col">{c}</th>
+        {/each}
+      </tr>
+    </thead>
 
-<table>
-  <thead>
-    <tr>
-      {#each columns as c}
-        <th>{c}</th>
-      {/each}
-    </tr>
-  </thead>
-
-  {#each data as row}
-    <tr>
-      {#each columns as c}
-        <td>
-          {Object.keys(tableFormat).includes(c)}: {Object.keys(tableFormat).includes(c) &&
-          typeof tableFormat[c] === "function"
-            ? tableFormat[c](row[c])
-            : row[c]}</td
-        >
-      {/each}
-    </tr>
-  {/each}
-</table>
+    {#each data as row}
+      <tr>
+        {#each columns as c}
+          <td
+            >{@html typeof tableFormat[c] === "function"
+              ? tableFormat[c](row[c])
+              : row[c]}</td
+          >
+        {/each}
+      </tr>
+    {/each}
+  </table>
+{/if}

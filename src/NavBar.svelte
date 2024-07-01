@@ -27,7 +27,7 @@
           <a class="nav-link active" aria-current="page" href="/recPapers/">Recommend papers</a>
         </li> -->
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{base}//authors"
+          <a class="nav-link active" aria-current="page" href="{base}/authors"
             >Search authors</a
           >
         </li>

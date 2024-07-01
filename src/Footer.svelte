@@ -38,16 +38,23 @@
     <p>
       <a href="https://ai.northeastern.edu/"
         ><img
-          height="100"
+          height="60"
           src="https://assets-global.website-files.com/657141b092d019b05ff57885/657141b092d019b05ff578d4_EAI_Wordmark_Dark.webp"
           alt="EAI Logo"
         /></a
       >
       <a href="https://jsalt2023.univ-lemans.fr/en/index.html"
         ><img
-          height="150"
+          height="70"
           src="https://jsalt2023.univ-lemans.fr/_resource/Logo/logo-haut.png"
           alt="JSALT Logo"
+        /></a
+      >
+      <a href="https://www.vecml.com"
+        ><img
+          height="60"
+          src="https://www.vecml.com/homepage/images/logo.png"
+          alt="VecML Logo"
         /></a
       >
     </p>
