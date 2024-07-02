@@ -7,13 +7,17 @@
   import { page } from "$app/stores";
   import { browser } from "$app/environment";
 
-  $: CorpusId = "";
+  let CorpusId = "";
 
   let notebookRecommendations;
 
   // $: CorpusId = $page.url.searchParams.get("CorpusId");
   // call setCorpusId when CorpusId changes
   $: CorpusId && notebookRecommendations && setCorpusId();
+
+  $: CorpusId = browser ? $page.url.searchParams.get("CorpusId"): "";
+
+  console.log("recPapers page", CorpusId, browser);
 
   function loadNotebook() {
     console.log("Loading notebook paper recommendations");
@@ -93,16 +97,12 @@
     );
   }
 
+  
+
   onMount(() => {
     loadNotebook();
 
     async function init() {
-      if (browser) {
-        CorpusId = $page.url.searchParams.get("CorpusId");
-        console.log("CorpusId", CorpusId);
-        
-      }
-
       addMoreLikeButton(notebookRecommendations);
       setNotebookWidth(notebookRecommendations);
       setCorpusId();

@@ -1,6 +1,9 @@
 table {
   width: 100%;
 }
+form:has(table) {
+  max-height: fit-content !important;
+}
 table td {
   white-space: normal !important;
 }
