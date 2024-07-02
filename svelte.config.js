@@ -2,7 +2,6 @@ import adapter from "@sveltejs/adapter-static";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  paths: { base: "/viz/paperSimilarity" },
   kit: {
     adapter: adapter({
       // default options are shown. On some platforms
@@ -11,9 +10,10 @@ const config = {
       assets: "build",
       fallback: "error.html",
       precompress: false,
-      strict: true,
-    }),
+      strict: true
+    })
   },
+  paths: { base: "/viz/paperSimilarity", relative: false }
 };
 
 export default config;

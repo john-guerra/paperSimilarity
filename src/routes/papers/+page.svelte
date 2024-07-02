@@ -8,7 +8,7 @@
   import { browser } from "$app/environment";
 
   import { SERVER_URL } from "$lib/constants.js";
-  import Slider from "$lib/Slider.svelte";
+  // import Slider from "$lib/components/Slider.svelte";
 
   // Papers is a reactive variable
   let papers = [];
@@ -97,7 +97,7 @@
           bind:value={query}
         />
       </label>
-      <Slider bind:value={limit} label="Max number of results to show"></Slider>
+      <!-- <Slider bind:value={limit} label="Max number of results to show"></Slider> -->
       <div><button class="btn btn-primary" type="submit">Search</button></div>
     </form>
 

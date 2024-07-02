@@ -1,34 +1,33 @@
-<footer class="footer bg-body-tertiary">
+<div class="pb-100"></div>
+<footer class="footer bg-light fixed-bottom">
   <div class="container-fluid">
     <div class="navbar navbar-expand-lg">
       <div class="collapse navbar-collapse" id="navbarNavFooter">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a href="http://34.204.188.58/similar_documentation.html">Help</a>
+            <a class="nav-link" href="http://34.204.188.58/similar_documentation.html">Help</a>
           </li>
           <li class="nav-item">
-            <a href="http://34.204.188.58/files/">Bulk Download</a>
+            <a class="nav-link" href="http://34.204.188.58/files/">Bulk Download</a>
           </li>
           <li class="nav-item">
-            <a href="https://github.com/kwchurch">GitHub</a>
+            <a class="nav-link" href="https://github.com/kwchurch">GitHub</a>
           </li>
           <li class="nav-item">
-            <a href="https://www.youtube.com/watch?v=jE49IreXs2U"
+            <a class="nav-link" href="https://www.youtube.com/watch?v=jE49IreXs2U"
               >Final Report (YouTube)</a
             >
           </li>
           <li class="nav-item">
-            <a href="https://jsalt2023.univ-lemans.fr/en/index.html"
-              >JSALT-2023</a
-            >
+            <a class="nav-link" href="https://jsalt2023.univ-lemans.fr/en/index.html">JSALT-2023</a>
           </li>
           <li class="nav-item">
-            <a href="mailto:k.church@northeastern.edu?subject=Better Together"
+            <a class="nav-link" href="mailto:k.church@northeastern.edu?subject=Better Together"
               >Contact us (by email)</a
             >
           </li>
           <li class="nav-item">
-            <a href="http://34.204.188.58/similar.BETA.html">BETA Version</a>
+            <a class="nav-link" href="http://34.204.188.58/similar.BETA.html">BETA Version</a>
           </li>
         </ul>
       </div>
@@ -69,4 +68,6 @@
     position: absolute;
     bottom: 0;
   } */
+
+  
 </style>

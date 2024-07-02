@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import Table from "$lib/Table.svelte";
+  import Table from "$lib/components/Table.svelte";
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
   import { SERVER_URL } from "$lib/constants.js";

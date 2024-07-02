@@ -8,8 +8,8 @@
   import { browser } from "$app/environment";
   import { base } from "$app/paths";
 
-  import Table from "$lib/Table.svelte";
-  import Slider from "$lib/Slider.svelte";
+  import Table from "$lib/components/Table.svelte";
+  // import Slider from "$lib/components/Slider.svelte";
 
   // Papers is a reactive variable
   let authors = [];
@@ -54,7 +54,7 @@
           bind:value={query}
         />
       </label>
-      <Slider value={limit} label="Max number of results to show"></Slider>
+      <!-- <Slider value={limit} label="Max number of results to show"></Slider> -->
       <div><button class="btn btn-primary" type="submit">Search</button></div>
     </form>
 
