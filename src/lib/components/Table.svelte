@@ -3,7 +3,7 @@
 
   export let columns = data?.length ? Object.keys(data[0]) : [];
   export let tableFormat = {};
-  console.log("Table data: ", data, columns, tableFormat);
+  // console.log("Table data: ", data, columns, tableFormat);
 </script>
 
 {#if !data.length}
@@ -20,10 +20,10 @@
 
     {#each data as row}
       <tr>
-        {#each columns as c}
+        {#each columns as c, i}
           <td
             >{@html typeof tableFormat[c] === "function"
-              ? tableFormat[c](row[c])
+              ? tableFormat[c](row[c], i, row)
               : row[c]}</td
           >
         {/each}

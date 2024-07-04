@@ -17,7 +17,6 @@
   let limit = 25;
 
   if (browser) {
-    console.log($page.url);
     query = $page.url.searchParams.get("q") || "";
   }
 
@@ -29,15 +28,30 @@
   }
 
   async function getData() {
+    console.log("Get data", query);
     setQueryUrl(query);
+    authors = [];
 
-    authors = (
-      await fetch(
-        `${SERVER_URL}/cgi-bin/author_search?query=${query}&limit=${limit}&fields=hIndex,citationCount,paperCount,name,affiliations,externalIds,papers.externalIds,papers.title&sort_by=hIndex`
-      ).then((res) => res.json())
-    ).search_results;
-    console.log("Got authors: ", authors);
+    let url = `${SERVER_URL}/cgi-bin/author_search?query=${query}&limit=${limit}&fields=hIndex,citationCount,paperCount,name,affiliations,externalIds,papers.externalIds,papers.title&sort_by=hIndex`;
+    console.log("fetching authors", url);
+    let res = await fetch(url);
+
+    if (res.ok) {
+      let data = await res.json();
+      console.log("Got authors: ", data);
+      authors = data.search_results;
+      return authors;
+    } else {
+      console.log(res);
+      throw new Error("Failed to fetch authors");
+    }
   }
+
+  onMount(async () => {
+    if (query) {
+      promise = await getData();
+    }
+  });
 </script>
 
 <div class="row">
@@ -47,37 +61,35 @@
     <form id="queryForm" action="" on:submit|preventDefault={getData}>
       <label class="form-label w-100"
         >Query
-        <input
-          id="query"
-          type="text"
-          class="form-control w-100"
-          bind:value={query}
-        />
+        <input id="query" type="text" class="form-control w-100" bind:value={query} />
       </label>
       <!-- <Slider value={limit} label="Max number of results to show"></Slider> -->
       <div><button class="btn btn-primary" type="submit">Search</button></div>
     </form>
+    {#if authors?.length}
+      <h2>Authors found</h2>
 
-    <h2>Authors found</h2>
-
-    {authors.length} authors found
-    <br />
-    <Table
-      data={authors}
-      tableFormat={{
-        papers: (papers) =>
-          `<div style="max-height:10em; overflow:scroll">${papers
-            .map(
-              (paper) =>
-                `<span class="mx-1"><a href="${base}/papers/?q=${paper.title}">${paper.title}</a></span >`
-            )
-            .join("")}</div>`,
-      }}
-      columns={"authorId,name,affiliations,paperCount,citationCount,hIndex,papers".split(
-        ","
-      )}
-    ></Table>
-    <hr />
+      {authors?.length} authors found
+      <br />
+      <Table
+        data={authors}
+        tableFormat={{
+          name: (name) =>
+            `<a href="${base}/authors/?q=${name}" title="Search for this author">${name}</a>`,
+          authorId: (authorId, i, author) =>
+            `<a href="https://www.semanticscholar.org/author/${author.name}/${authorId}" title="See in semantic scholar">${authorId}</a>`,
+          papers: (papers) =>
+            `<div style="max-height:10em; overflow:scroll">${papers
+              .map(
+                (paper) =>
+                  `<span class="mx-1"><a href="${base}/papers/?q=${paper.title}">${paper.title}</a></span >`
+              )
+              .join("")}</div>`
+        }}
+        columns={"authorId,name,affiliations,paperCount,citationCount,hIndex,papers".split(",")}
+      ></Table>
+      <hr />
+    {/if}
   </div>
   <!-- /col-12 -->
 </div>

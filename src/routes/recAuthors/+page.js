@@ -1,21 +1,30 @@
-// import { browser } from "$app/environment";
-// import { SERVER_URL } from "$lib/constants.js";
+import { browser } from "$app/environment";
+import { SERVER_URL } from "$lib/constants.js";
 
-// export async function load({ fetch, url }) {
-//   let CorpusId = "6496359";
-//   if (browser) {
-//     CorpusId = url.searchParams.get("CorpusId");
-//   }
+export async function load({ fetch, url }) {
+  let CorpusId = "6496359";
+  if (browser) {
+    CorpusId = url.searchParams.get("CorpusId");
+  }
 
-//   const authors = (
-//     await fetch(
-//       `${SERVER_URL}/cgi-bin/recommend_authors?id=${CorpusId}&method=ProNE&fields=citationCount,externalIds&score1=prone,specter,scincl,gnn&score2=prone,specter,scincl,gnn`
-//     ).then((res) => res.json())
-//   ).experts.map((author) => {
-//     author.options = author.authorId;
-//     return author;
-//   });
-//   console.log("Got authors: ", authors.length);
+  let res = await fetch(
+    `${SERVER_URL}/cgi-bin/recommend_authors?id=${CorpusId}&method=ProNE&fields=authorId,citationCount,externalIds,url,name,homepage,hIndex,affiliations,papers.title,papers.externalIds,papers.citationCount&score1=prone,specter,scincl,gnn&score2=prone,specter,scincl,gnn`
+  );
 
-//   return { authors, CorpusId };
-// }
+  if (res.ok) {
+    const data = await res.json();
+    console.log("Got data: ", data);
+    return {
+      authors: data.experts.map((author) => {
+        author.options = author.authorId;
+        return author;
+      }),
+      data,
+      CorpusId
+    };
+  } else {
+    console.error("Failed to fetch data: ", res);
+    throw new Error("Failed to fetch author recommendations");
+    // return { authors: [], CorpusId };
+  }
+}

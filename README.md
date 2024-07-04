@@ -1,18 +1,5 @@
-# create-svelte
+# Paper Similarity UI
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
 
 ## Developing
 
@@ -33,6 +20,15 @@ To create a production version of your app:
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+You can preview the production build with `npm run preview`. The production build will lay on the build folder
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## Observable Dependencies
+
+Uses two observable notebooks, to reflect their changes
+
+```bash
+npm update @john-guerra/paper-similarity-search
+npm update @john-guerra/semantic-scholar-recommended-papers
+
+npm run build
+```

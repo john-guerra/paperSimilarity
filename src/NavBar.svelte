@@ -27,8 +27,8 @@
       <ul class="navbar-nav">
         
 
-        <NavLink href="{base}/authors/">Search papers</NavLink>
-        <NavLink href="{base}/papers/">Search authors</NavLink>
+        <NavLink href="{base}/papers/">Search papers</NavLink>
+        <NavLink href="{base}/authors/">Search authors</NavLink>
 
         <!-- <li class="nav-item">
           <a class="nav-link" href="{base}/"
