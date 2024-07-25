@@ -11,7 +11,7 @@
 
   // async function getAuthors(CorpusId) {
   //   const res = await fetch(
-  //     `${SERVER_URL}/cgi-bin/recommend_authors?id=${CorpusId}&sort_by=hIndex&method=ProNE&fields=citationCount,externalIds&score1=prone,specter,scincl,gnn&score2=prone,specter,scincl,gnn`
+  //     `${SERVER_URL}/api/recommend_authors?id=${CorpusId}&sort_by=hIndex&method=ProNE&fields=citationCount,externalIds&score1=prone,specter,scincl,gnn&score2=prone,specter,scincl,gnn`
   //   );
   //   if (res.ok) {
   //     return (await res.json()).experts;
@@ -41,6 +41,6 @@
   <Table
     data={authors}
     columns={["name", "score", "hIndex", "url"]}
-    tableFormat={{ url: (url) => `<a href="${url}">${url}</Table>` }}
+    tableFormat={{ name: (name, i, row) => `<a href="${row.url}">${name}</a>` }}
   />
 {/await}

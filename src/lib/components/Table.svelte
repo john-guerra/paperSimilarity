@@ -3,10 +3,12 @@
 
   export let columns = data?.length ? Object.keys(data[0]) : [];
   export let tableFormat = {};
-  // console.log("Table data: ", data, columns, tableFormat);
+  console.log("Table data: ", data, columns, tableFormat);
+
+  $: data;
 </script>
 
-{#if !data.length}
+{#if !data?.length}
   <div>No data to show</div>
 {:else}
   <table class="table">

@@ -1,8 +1,9 @@
 <script>
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
 
-  import * as Inputs from "@observablehq/inputs";
+  import { afterNavigate } from "$app/navigation";
+
+
   import { page } from "$app/stores";
   import { SERVER_URL } from "$lib/constants.js";
   import { browser } from "$app/environment";
@@ -10,29 +11,44 @@
 
   import Table from "$lib/components/Table.svelte";
   // import Slider from "$lib/components/Slider.svelte";
+  import { setQueryUrl, getDataAuthorLookup } from "$lib/utils";
 
   // Papers is a reactive variable
   let authors = [];
   let query = "";
   let limit = 25;
+  let scores = [];
 
   if (browser) {
     query = $page.url.searchParams.get("q") || "";
   }
 
-  function setQueryUrl(q) {
-    $page.url.searchParams.set("q", q);
-    // shallow routing
-    // replaceState(page.url.href);
-    goto($page.url.href);
+  // function setQueryUrl(q) {
+  //   $page.url.searchParams.set("q", q);
+  //   // shallow routing
+  //   // replaceState(page.url.href);
+  //   goto($page.url.href);
+  // }
+
+  async function getScoresForAllAuthors() {
+    if (!authors?.length) {
+      console.log("getScoresForAllAuthors no authors", authors)
+      return;
+    }
+    for (let author of authors) {
+      getDataAuthorLookup(author.authorId).then((res) => {
+        scores.push(res.scoresMatrices);
+        console.log("Got lookupAuthor for", author);
+      });      
+    }
   }
 
   async function getData() {
     console.log("Get data", query);
-    setQueryUrl(query);
+    setQueryUrl($page, { q: query });
     authors = [];
 
-    let url = `${SERVER_URL}/cgi-bin/author_search?query=${query}&limit=${limit}&fields=hIndex,citationCount,paperCount,name,affiliations,externalIds,papers.externalIds,papers.title&sort_by=hIndex`;
+    let url = `${SERVER_URL}/api/author_search?query=${query}&limit=${limit}&fields=hIndex,citationCount,paperCount,name,affiliations,externalIds,papers.externalIds,papers.title&sort_by=hIndex`;
     console.log("fetching authors", url);
     let res = await fetch(url);
 
@@ -40,6 +56,8 @@
       let data = await res.json();
       console.log("Got authors: ", data);
       authors = data.search_results;
+
+      getScoresForAllAuthors();
       return authors;
     } else {
       console.log(res);
@@ -49,7 +67,14 @@
 
   onMount(async () => {
     if (query) {
-      promise = await getData();
+      await getData();
+    }
+  });
+
+  afterNavigate(() => {
+    if ($page.url.searchParams.get("q") !== query) {
+      query = $page.url.searchParams.get("q") || query;
+      getData();
     }
   });
 </script>
@@ -74,10 +99,11 @@
       <Table
         data={authors}
         tableFormat={{
-          name: (name) =>
-            `<a href="${base}/authors/?q=${name}" title="Search for this author">${name}</a>`,
-          authorId: (authorId, i, author) =>
-            `<a href="https://www.semanticscholar.org/author/${author.name}/${authorId}" title="See in semantic scholar">${authorId}</a>`,
+          name: (name, _, author) =>
+            `<a href="${base}/author/?authorId=${author.authorId}" title="Search for this author">${name}</a><a href="https://www.semanticscholar.org/author/${author.name}/${author.authorId}" title="See in semantic scholar">⤴️</a>`,
+          authorId: (authorId, _, author) =>
+            `<a href="${base}/author/?authorId=${author.authorId}" title="Search for this author">${author.authorId}</a>
+          <a href="https://www.semanticscholar.org/author/${author.name}/${authorId}" title="See in semantic scholar">⤴️</a>`,
           papers: (papers) =>
             `<div style="max-height:10em; overflow:scroll">${papers
               .map(

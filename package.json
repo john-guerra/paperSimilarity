@@ -15,7 +15,7 @@
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-static": "^3.0.2",
-		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/kit": "^2.5.18",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "^8.56.7",
 		"eslint": "^9.0.0",
@@ -25,15 +25,21 @@
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
 		"svelte": "^4.2.7",
-		"vite": "^5.0.3"
+		"vite": "^5.3.3"
 	},
 	"type": "module",
 	"dependencies": {
+		"@john-guerra/multi-auto-select": "https://api.observablehq.com/@john-guerra/multi-auto-select@latest.tgz?v=3",
 		"@john-guerra/paper-similarity-search": "https://api.observablehq.com/@john-guerra/paper-similarity-search@latest.tgz?v=3",
 		"@john-guerra/semantic-scholar-recommended-papers": "https://api.observablehq.com/@john-guerra/semantic-scholar-recommended-papers.tgz?v=3",
+		"@john-guerra/vega-selected": "https://api.observablehq.com/@john-guerra/vega-selected.tgz?v=3",
 		"@observablehq/inputs": "^0.10.6",
 		"@observablehq/runtime": "^5.9.8",
 		"d3": "^7.9.0",
-		"htl": "^0.3.1"
+		"htl": "^0.3.1",
+		"vega": "^5.30.0",
+		"vega-lite": "^5.19.0",
+		"vega-lite-api": "^5.6.0",
+		"vega-tooltip": "^0.34.0"
 	}
 }
