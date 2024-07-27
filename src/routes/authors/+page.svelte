@@ -3,43 +3,80 @@
 
   import { afterNavigate } from "$app/navigation";
 
-
   import { page } from "$app/stores";
   import { SERVER_URL } from "$lib/constants.js";
   import { browser } from "$app/environment";
   import { base } from "$app/paths";
 
   import Table from "$lib/components/Table.svelte";
+  import EmbeddingsMatrix from "$lib/components/EmbeddingsMatrix.svelte";
   // import Slider from "$lib/components/Slider.svelte";
-  import { setQueryUrl, getDataAuthorLookup } from "$lib/utils";
+  import { setQueryUrl, getDataAuthorLookup, tdMaxHeight } from "$lib/utils";
 
-  // Papers is a reactive variable
+  import { cosineMatrix } from "$lib/cosineSimilarity.js";
+
   let authors = [];
   let query = "";
   let limit = 25;
-  let scores = [];
+  let scores = null;
+
+  let selectedPapers = [];
+  let papers = [];
+  let embeddings = null;
 
   if (browser) {
     query = $page.url.searchParams.get("q") || "";
   }
 
-  // function setQueryUrl(q) {
-  //   $page.url.searchParams.set("q", q);
-  //   // shallow routing
-  //   // replaceState(page.url.href);
-  //   goto($page.url.href);
-  // }
+  function concatenateEmbeddings(newEmbedding) {
+    if (!embeddings) {
+      embeddings = { ...newEmbedding };
+    } else {
+      for (let key in newEmbedding) {
+        if (key === "embeddings_requested") {
+          continue;
+        }
+        if (embeddings[key]) {
+          embeddings[key] = embeddings[key].concat(newEmbedding[key]);
+        } else {
+          embeddings[key] = newEmbedding[key];
+        }
+      }
+    }
+  }
+
+  function recomputeScores() {
+    const before = performance.now();
+
+    scores = {};
+    for (let key in embeddings) {
+      if (key === "embeddings_requested") {
+        continue;
+      }
+      scores[key] = cosineMatrix(embeddings[key]);
+    }
+    console.log("Concatenate scores matrix ", performance.now() - before, scores);
+    // trigger reactivity
+    scores = scores;
+    return scores;
+  }
 
   async function getScoresForAllAuthors() {
     if (!authors?.length) {
-      console.log("getScoresForAllAuthors no authors", authors)
+      console.log("getScoresForAllAuthors no authors", authors);
       return;
     }
     for (let author of authors) {
       getDataAuthorLookup(author.authorId).then((res) => {
-        scores.push(res.scoresMatrices);
-        console.log("Got lookupAuthor for", author);
-      });      
+        // scores.set(author.authorId, res.scoresMatrices);
+        console.log("Got lookupAuthor for", author, res);
+        papers = res.results.papers.map((p, i) => ({ ...p, authorId: author.authorId, i }));
+        // trigger reactivity
+        papers = papers;
+        concatenateEmbeddings(res.results.embeddings);
+        recomputeScores();
+        console.log("Got lookupAuthor for", author, scores, papers, embeddings);
+      });
     }
   }
 
@@ -92,9 +129,7 @@
       <div><button class="btn btn-primary" type="submit">Search</button></div>
     </form>
     {#if authors?.length}
-      <h2>Authors found</h2>
-
-      {authors?.length} authors found
+      <h2>Authors found ({authors?.length})</h2>
       <br />
       <Table
         data={authors}
@@ -115,6 +150,36 @@
         columns={"authorId,name,affiliations,paperCount,citationCount,hIndex,papers".split(",")}
       ></Table>
       <hr />
+
+      <h3>Paper comparison for these authors</h3>
+      <div>Here is a comparison of the papers returned for these authors</div>
+      {#if papers && scores}
+        {#key scores?.prone?.length}
+          <EmbeddingsMatrix
+            {scores}
+            {papers}
+            method="prone"
+            embedding="prone"
+            {limit}
+            width={600}
+            bind:selected={selectedPapers}
+            on:input={(evt) =>
+              console.log("✂️ Selected papers changed", selectedPapers, evt?.detail?.value)}
+          ></EmbeddingsMatrix>
+        {/key}
+      {/if}
+
+      {#key selectedPapers}
+        <Table
+          data={selectedPapers}
+          tableFormat={{
+            title: (t, i, d) => tdMaxHeight(`<a href="${base}/papers/?q=${d.title}" >${t}</a>`),
+            authors: (authors) =>
+              `${tdMaxHeight(authors.map((a) => `<a href="${base}/author/?authorId=${a.authorId}">${a.name}</a>`).join(", "))}`
+          }}
+          columns={["i", "selected", "title", "year", "citationCount", "authors", "authorId"]}
+        ></Table>
+      {/key}
     {/if}
   </div>
   <!-- /col-12 -->

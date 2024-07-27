@@ -66,7 +66,12 @@ export function setQueryUrl(page, params) {
 export async function getDataAuthorLookup(
   authorId,
 
-  { $page = null, limit = 10, embeddingsSelected = ["prone", "specter", "gnn"] } = {}
+  {
+    $page = null,
+    limit = 10,
+    embeddingsSelected = ["prone", "specter", "gnn"],
+    score2Selected = null
+  } = {}
 ) {
   console.log("getDataAuthorLookup ", authorId, limit, embeddingsSelected);
   $page && setQueryUrl($page, { authorId });
@@ -76,11 +81,11 @@ export async function getDataAuthorLookup(
 
   let url = `${SERVER_URL}api/lookup_author?id=${authorId}`;
   url += `&fields=hIndex,name,affiliations,paperCount`;
-  url += `,papers,papers.citationCount,papers.title,papers.externalIds,papers.authors,papers.url`;
+  url += `,papers,papers.citationCount,papers.title,papers.externalIds,papers.authors,papers.url,papers.year`;
   url += `&limit=${limit}`;
   url += `&sort_by=citationCount`;
-  url += `&score2=${embeddingsSelected.join(",")}`;
-  // url += `&embeddings=prone,specter,SciNCL,gnn,s2_api`;
+  url += score2Selected?.length ? `&score2=${embeddingsSelected.join(",")}` :"";
+  url += `&embeddings=${embeddingsSelected.join(",")}`;
 
   // let url = `${SERVER_URL}/api/author_search?query=${query}&limit=${limit}&fields=hIndex,citationCount,paperCount,name,affiliations,externalIds,papers.externalIds,papers.title&sort_by=hIndex`;
   console.log("getDataAuthorLookup url", url);
@@ -88,7 +93,8 @@ export async function getDataAuthorLookup(
 
   if (res.ok) {
     let data = await res.json();
-    console.log("Got results: ", data);
+
+
     data.papers.map((d, i) => {
       d.i = i;
       return d;
@@ -96,21 +102,24 @@ export async function getDataAuthorLookup(
     results = data;
     selectedPapers = results.papers;
 
-    if (results?.score2) {
+    if (results?.score2 !== undefined) {
       scoresMatrices = results.score2;
-    }
-    if (results?.embeddings) {
+    } else if (results?.embeddings?.embeddigs_requested !== undefined) {
       scoresMatrices = {};
       for (let method of results?.embeddings?.embeddigs_requested || []) {
         scoresMatrices[method] = cosineMatrix(results.embeddings[method]);
       }
     }
 
-    console.log("Scores matrices", scoresMatrices);
-
     return { results, scoresMatrices, selectedPapers };
   } else {
     console.log(res);
     throw new Error("Failed to fetch authors");
   }
+}
+
+// Wrap the contents of a TD in a span with max height
+// Make sure class tdMaxHeight is defined in the /style.css
+export function tdMaxHeight(content) {
+  return `<span class="tdMaxHeight">${content}</span>`;
 }

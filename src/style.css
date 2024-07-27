@@ -7,3 +7,11 @@ form:has(table) {
 table td {
   white-space: normal !important;
 }
+
+
+.tdMaxHeight {
+  max-height: 100px;
+  overflow: scroll;
+  white-space: normal;
+  display: inline-block
+}
