@@ -98,6 +98,7 @@ ${papers[j]?.title} -> ${papers[i]?.title}`,
 
     console.log(
       "TidyData",
+      recommendedPapers,
       tidyData,
       selectedScores,
       limit > 10 ? width / (3 + selectedScores.length * 0.5) : limit * 10

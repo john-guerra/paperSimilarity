@@ -66,11 +66,14 @@
       console.log("getScoresForAllAuthors no authors", authors);
       return;
     }
+    papers = [];
     for (let author of authors) {
       getDataAuthorLookup(author.authorId).then((res) => {
         // scores.set(author.authorId, res.scoresMatrices);
         console.log("Got lookupAuthor for", author, res);
-        papers = res.results.papers.map((p, i) => ({ ...p, authorId: author.authorId, i }));
+        papers = papers.concat(
+          res.results.papers.map((p) => ({ ...p, authorId: author.authorId }))
+        );
         // trigger reactivity
         papers = papers;
         concatenateEmbeddings(res.results.embeddings);
@@ -163,22 +166,22 @@
             {limit}
             width={600}
             bind:selected={selectedPapers}
-            on:input={(evt) =>
-              console.log("✂️ Selected papers changed", selectedPapers, evt?.detail?.value)}
           ></EmbeddingsMatrix>
         {/key}
       {/if}
 
       {#key selectedPapers}
-        <Table
-          data={selectedPapers}
-          tableFormat={{
-            title: (t, i, d) => tdMaxHeight(`<a href="${base}/papers/?q=${d.title}" >${t}</a>`),
-            authors: (authors) =>
-              `${tdMaxHeight(authors.map((a) => `<a href="${base}/author/?authorId=${a.authorId}">${a.name}</a>`).join(", "))}`
-          }}
-          columns={["i", "selected", "title", "year", "citationCount", "authors", "authorId"]}
-        ></Table>
+        <div style="height: 600px; overflow: scroll">
+          <Table
+            data={selectedPapers}
+            tableFormat={{
+              title: (t, i, d) => tdMaxHeight(`<a href="${base}/papers/?q=${d.title}" >${t}</a>`),
+              authors: (authors) =>
+                `${tdMaxHeight(authors.map((a) => `<a href="${base}/author/?authorId=${a.authorId}">${a.name}</a>`).join(", "))}`
+            }}
+            columns={["__i", "selected", "title", "year", "citationCount", "authors", "authorId"]}
+          ></Table>
+        </div>
       {/key}
     {/if}
   </div>
