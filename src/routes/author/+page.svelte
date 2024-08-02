@@ -20,21 +20,28 @@
   $: results = null;
   let embeddings = "prone,specter,SciNCL,gnn,s2_api".split(",");
   let embeddingsSelected = ["prone", "specter", "gnn"];
-  let scoresMatrices = null;
+  $: scoresMatrices = null;
   let selectedPapers = [];
 
   // $: embeddingsSelected && getData();
 
   async function getData() {
-    const res = await getDataAuthorLookup(authorId, { $page, limit, embeddingsSelected });
+    const res = await getDataAuthorLookup(authorId, {
+      $page,
+      limit,
+      embeddingsSelected,
+      score2Selected: embeddingsSelected
+    });
     results = res.results;
     scoresMatrices = res.scoresMatrices;
     selectedPapers = res.selectedPapers;
+
+    scoresMatrices = scoresMatrices;
+    console.log("got data", scoresMatrices, results);
   }
 
   onMount(async () => {
     if (authorId) {
-      console.log("onMount get Data");
       getData();
     }
   });
@@ -60,19 +67,22 @@ for authorId: {authorId}
   <div class="row">
     <div class="col-12">
       <h3>Papers</h3>
-      {#if results && scoresMatrices}
-        <EmbeddingsMatrix
-          scores={scoresMatrices}
-          papers={results.papers}
-          method="prone"
-          embedding="prone"
-          {limit}
-          width={600}
-          bind:selected={selectedPapers}
-          on:input={(evt) =>
-            console.log("✂️ Selected papers changed", selectedPapers, evt?.detail?.value)}
-        ></EmbeddingsMatrix>
-      {/if}
+      Matrix : {scoresMatrices?.length}
+      {#key scoresMatrices}
+        {#if results && scoresMatrices}
+          <EmbeddingsMatrix
+            scores={scoresMatrices}
+            papers={results.papers}
+            method="prone"
+            embedding="prone"
+            {limit}
+            width={600}
+            bind:selected={selectedPapers}
+            on:input={(evt) =>
+              console.log("✂️ Selected papers changed", selectedPapers, evt?.detail?.value)}
+          ></EmbeddingsMatrix>
+        {/if}
+      {/key}
       <Table
         data={selectedPapers}
         tableFormat={{
