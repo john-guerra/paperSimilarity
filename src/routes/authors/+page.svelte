@@ -4,25 +4,40 @@
   import { afterNavigate } from "$app/navigation";
 
   import { page } from "$app/stores";
-  import { SERVER_URL } from "$lib/constants.js";
+  import { SERVER_URL, EMBEDDINGS } from "$lib/constants.js";
   import { browser } from "$app/environment";
   import { base } from "$app/paths";
 
   import Table from "$lib/components/Table.svelte";
   import EmbeddingsMatrix from "$lib/components/EmbeddingsMatrix.svelte";
-  // import Slider from "$lib/components/Slider.svelte";
+  import MultiAutoSelect from "$lib/components/MultiAutoSelect.svelte";
+  import PromiseStatus from "$lib/components/PromiseStatus.svelte";
+
+  import Slider from "$lib/components/Slider.svelte";
   import { setQueryUrl, getDataAuthorLookup, tdMaxHeight } from "$lib/utils";
 
   import { cosineMatrix } from "$lib/cosineSimilarity.js";
+  
+  
+  import { error } from "@sveltejs/kit";
 
+
+  let promise = Promise.resolve([]);
+  let promisesAuthors = [];
   let authors = [];
   let query = "";
-  let limit = 25;
+  let limit = 10;
   let scores = null;
+  let embeddingsSelected = ["ProNE", "Specter", "GNN"];
+  let embeddingsOptions = EMBEDDINGS;
 
   let selectedPapers = [];
   let papers = [];
   let embeddings = null;
+
+
+  // we trigger getDataForAllAuthors for limit when the drag is over
+  // $: embeddingsSelected && getScoresForAllAuthors();
 
   if (browser) {
     query = $page.url.searchParams.get("q") || "";
@@ -66,31 +81,50 @@
       console.log("getScoresForAllAuthors no authors", authors);
       return;
     }
+    console.log("getScoresForAllAuthors", authors, limit, embeddingsSelected);
     papers = [];
+    embeddings = {};
+    scores = {};
+    promisesAuthors = [];
     for (let author of authors) {
-      getDataAuthorLookup(author.authorId).then((res) => {
-        // scores.set(author.authorId, res.scoresMatrices);
-        console.log("Got lookupAuthor for", author, res);
-        papers = papers.concat(
-          res.results.papers.map((p) => ({ ...p, authorId: author.authorId }))
-        );
-        // trigger reactivity
-        papers = papers;
-        concatenateEmbeddings(res.results.embeddings);
-        recomputeScores();
-        console.log("Got lookupAuthor for", author, scores, papers, embeddings);
-      });
+      promisesAuthors.push(
+        getDataAuthorLookup(author.authorId, {
+          limit,
+          embeddingsSelected
+        }).then((res) => {
+          // scores.set(author.authorId, res.scoresMatrices);
+          console.log("Got lookupAuthor for", author, res);
+          papers = papers.concat(
+            res.results.papers.map((p) => ({ ...p, authorId: author.authorId }))
+          );
+          // trigger reactivity
+          papers = papers;
+          concatenateEmbeddings(res.results.embeddings);
+          recomputeScores();
+          console.log("Got lookupAuthor for", author, scores, papers, embeddings);
+        })
+      );
     }
+
+    promisesAuthors = promisesAuthors;
+    console.log("promisesAuthors", promisesAuthors);
   }
 
   async function getData() {
+    if (query === "") {
+      authors = null;
+      return;
+    }
     console.log("Get data", query);
     setQueryUrl($page, { q: query });
     authors = [];
 
+    console.log("fetch", self, self.fetch, fetch);
     let url = `${SERVER_URL}/api/author_search?query=${query}&limit=${limit}&fields=hIndex,citationCount,paperCount,name,affiliations,externalIds,papers.externalIds,papers.title&sort_by=hIndex`;
     console.log("fetching authors", url);
-    let res = await fetch(url);
+    let res;
+
+    res = await self.fetch(url);
 
     if (res.ok) {
       let data = await res.json();
@@ -100,14 +134,14 @@
       getScoresForAllAuthors();
       return authors;
     } else {
-      console.log(res);
-      throw new Error("Failed to fetch authors");
+      console.log("🚫 Error", res);
+      throw error(500, { message: "john" });
     }
   }
 
   onMount(async () => {
     if (query) {
-      await getData();
+      promise = getData();
     }
   });
 
@@ -123,17 +157,24 @@
   <div class="col-12">
     <h1>Search Authors</h1>
 
-    <form id="queryForm" action="" on:submit|preventDefault={getData}>
+    <form id="queryForm" action="" on:submit|preventDefault={() => (promise = getData())}>
       <label class="form-label w-100"
         >Query
         <input id="query" type="text" class="form-control w-100" bind:value={query} />
       </label>
-      <!-- <Slider value={limit} label="Max number of results to show"></Slider> -->
+
       <div><button class="btn btn-primary" type="submit">Search</button></div>
     </form>
-    {#if authors?.length}
+
+    {#await promise}
+      Loading data...
+    {:then authors}
+      {#if authors?.length === 0}
+        <div>No authors found</div>
+      {:else }
       <h2>Authors found ({authors?.length})</h2>
       <br />
+
       <Table
         data={authors}
         tableFormat={{
@@ -152,23 +193,42 @@
         }}
         columns={"authorId,name,affiliations,paperCount,citationCount,hIndex,papers".split(",")}
       ></Table>
+
       <hr />
 
       <h3>Paper comparison for these authors</h3>
       <div>Here is a comparison of the papers returned for these authors</div>
-      {#if papers && scores}
-        {#key scores?.prone?.length}
+      <MultiAutoSelect
+        options={embeddingsOptions}
+        params={{ label: "Embeddings to request:" }}
+        bind:value={embeddingsSelected}
+      />
+      <Slider value={limit} label="Max number of results to show"></Slider>
+      <button class="btn btn-primary" on:click={getScoresForAllAuthors}>Update Comparison</button>
+
+      <!-- Fetch status -->
+      <div>
+        {#key promisesAuthors}
+          Data requests status:
+          {#each promisesAuthors as p}
+            <PromiseStatus promise={p}></PromiseStatus>
+          {/each}
+        {/key}
+      </div>
+
+      {#key scores?.ProNE?.length}
+        {#if papers && scores}
           <EmbeddingsMatrix
             {scores}
             {papers}
-            method="prone"
-            embedding="prone"
+            method="ProNE"
+            embedding="ProNE"
             {limit}
             width={600}
             bind:selected={selectedPapers}
           ></EmbeddingsMatrix>
-        {/key}
-      {/if}
+        {/if}
+      {/key}
 
       {#key selectedPapers}
         <div style="height: 600px; overflow: scroll">
@@ -183,7 +243,14 @@
           ></Table>
         </div>
       {/key}
-    {/if}
+      {/if} 
+      <!-- /if authors.length -->
+
+
+
+    {:catch error}
+      <p style="color: red">{error.message}</p>
+    {/await}
   </div>
   <!-- /col-12 -->
 </div>

@@ -5,26 +5,25 @@
   import { page } from "$app/stores";
   import { setQueryUrl, tdMaxHeight } from "$lib/utils.js";
   import { browser } from "$app/environment";
-  import * as htl from "htl";
 
   import { base } from "$app/paths";
 
-  import { SERVER_URL } from "../../lib/constants.js";
+  import { SERVER_URL, METHODS } from "../../lib/constants.js";
   import Slider from "$lib/components/Slider.svelte";
-  import Select from "../../lib/components/Select.svelte";
+  // import Select from "../../lib/components/Select.svelte";
 
   import Table from "$lib/components/Table.svelte";
+  // import EmbeddingsProjection from "$lib/components/EmbeddingsProjection.svelte";
 
   // Papers is a reactive variable
   let papers = null;
-  let query = "Personalizing Search via Association";
+  // let query = "Personalizing Search via Association";
+  let query = "";
   let limit = 10;
-  // let method = METHODS[0];
 
   $: papers;
 
   if (browser) {
-    console.log("trying to get query from url", $page.url.searchParams.get("q"));
     query = $page.url.searchParams.get("q") || query;
   }
 
@@ -36,18 +35,14 @@
       return;
     }
 
+    // Clean up first for better experience
     papers = [];
     setQueryUrl($page, { q: query });
 
-    // Clean up first for better experience
-    // notebookPaperSearch.redefine("papers", []);
+    let url = `${SERVER_URL}api/paper_search?query=${query}&limit=${limit}`;
 
-    papers = (
-      await fetch(
-        `${SERVER_URL}api/paper_search?query=${query}&limit=${limit}`
-        // `https://34.204.188.58/api/paper_search?query=${query}&limit=25`
-      ).then((res) => res.json())
-    ).search_results.map((d) => ({
+    console.log("Get papers url", url);
+    papers = (await fetch(url).then((res) => res.json())).search_results.map((d) => ({
       ...d,
       url: `/papers/?q=${d.title}`,
       options: d?.externalIds?.CorpusId,
@@ -79,7 +74,7 @@
         >Query
         <input id="query" type="text" class="form-control w-100" bind:value={query} />
       </label>
-      <!-- <Select label={"Method"} options={METHODS} bind:value={method}></Select> -->
+      <!-- <Select label={"Method for recommend papers"} options={METHODS} bind:value={method}></Select> -->
       <Slider bind:value={limit} label="Max number of results to show" on:input={getData}></Slider>
       <div><button class="btn btn-primary" type="submit">Search</button></div>
     </form>
@@ -91,6 +86,10 @@
       <div>Loading...</div>
     {:else}
       <h2>Papers found ({papers.length})</h2>
+
+      <!-- <EmbeddingsProjection embeddings={papers.map((d) => d.embedding)} data={papers}
+      ></EmbeddingsProjection> -->
+
       <Table
         data={papers}
         tableFormat={{
@@ -98,7 +97,6 @@
           authors: (authors) =>
             `${tdMaxHeight(authors.map((a) => `<a href="${base}/author/?authorId=${a.authorId}">${a.name}</a>`).join(", "))}`,
           options: (CorpusId) => {
-            console.log("options", CorpusId);
             const btnPapers = `<a href="${base}/recPapers?CorpusId=${CorpusId}" class="btn btn-outline-primary btn-sm p-0" title=${CorpusId}>Similar papers</a>`;
             const btnAuthors = `<a href="${base}/recAuthors?CorpusId=${CorpusId}" class="btn btn-outline-primary btn-sm p-0" title=${CorpusId}>Authors related</a>`;
 

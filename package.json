@@ -29,6 +29,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@john-guerra/druidjs-generator": "https://api.observablehq.com/@john-guerra/druidjs-generator@latest.tgz?v=3",
+		"@john-guerra/embeddings-projection": "https://api.observablehq.com/@john-guerra/embeddings-projection.tgz?v=3",
 		"@john-guerra/multi-auto-select": "https://api.observablehq.com/@john-guerra/multi-auto-select@latest.tgz?v=3",
 		"@john-guerra/paper-similarity-search": "https://api.observablehq.com/@john-guerra/paper-similarity-search@latest.tgz?v=3",
 		"@john-guerra/semantic-scholar-recommended-papers": "https://api.observablehq.com/@john-guerra/semantic-scholar-recommended-papers.tgz?v=3",

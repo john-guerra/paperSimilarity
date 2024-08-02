@@ -69,7 +69,7 @@ export async function getDataAuthorLookup(
   {
     $page = null,
     limit = 10,
-    embeddingsSelected = ["prone", "specter", "gnn"],
+    embeddingsSelected = [],
     score2Selected = null
   } = {}
 ) {
@@ -84,8 +84,8 @@ export async function getDataAuthorLookup(
   url += `,papers,papers.citationCount,papers.title,papers.externalIds,papers.authors,papers.url,papers.year`;
   url += `&limit=${limit}`;
   url += `&sort_by=citationCount`;
-  url += score2Selected?.length ? `&score2=${embeddingsSelected.join(",")}` :"";
-  url += `&embeddings=${embeddingsSelected.join(",")}`;
+  url += score2Selected?.length ? `&score2=${score2Selected.join(",")}` :"";
+  url += embeddingsSelected?.length ? `&embeddings=${embeddingsSelected.join(",")}`: "";
 
   // let url = `${SERVER_URL}/api/author_search?query=${query}&limit=${limit}&fields=hIndex,citationCount,paperCount,name,affiliations,externalIds,papers.externalIds,papers.title&sort_by=hIndex`;
   console.log("getDataAuthorLookup url", url);

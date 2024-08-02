@@ -19,8 +19,8 @@
   export let columnOrder = "None";
   export let rowOrder = "None";
   export let width = 600;
-  export let method = "prone";
-  export let embedding = "prone";
+  export let method = "ProNE";
+  export let embedding = "ProNE";
   export let papers = [];
   // An object with the scores for each paper by method
   export let scores = {};
@@ -115,9 +115,14 @@ ${papers[j]?.title} -> ${papers[i]?.title}`,
           .x()
           .fieldO("i")
           .title(null)
-          .axis({ orient: "top" })
+          .axis(tidyData.length > 100 ? null : { orient: "top" })
           .sort(getOrderForAttrib(recommendedPapers, columnOrder)),
-        vl.y().fieldO("j").title(null).sort(getOrderForAttrib(recommendedPapers, rowOrder)),
+        vl
+          .y()
+          .fieldO("j")
+          .title(null)
+          .sort(getOrderForAttrib(recommendedPapers, rowOrder))
+          .axis(tidyData.length > 100 ? null : {}),
         vl.color().fieldQ(vl.repeat("repeat")),
         vl.opacity().if(brush, 1).value(0.3),
         vl.tooltip(["title"])
