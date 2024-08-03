@@ -13,12 +13,12 @@
   // The data elements should be and array of objects of size n
   export let data;
 
+  console.log("EmbeddingsProjection", embeddings, data);
+
   // validate matrix and data
   if (embeddings.length !== data.length) {
     throw new Error("embeddings and data should have the same length");
   }
-
-  console.log("EmbeddingsProjection", embeddings, data);
 
   // Where we draw the chart
   let targetSpan;
@@ -40,8 +40,15 @@
         min_dist: 1,
         seed: 1212
       },
-      colorBy: "year",
-      sizeBy: () => 10
+      chartOptions: {
+        width: 400,
+        height: 400,
+        color: "authorId",
+        colorType: "nominal",
+        colorScheme: "spectral",
+        size: 80
+
+      }
     });
   }
 

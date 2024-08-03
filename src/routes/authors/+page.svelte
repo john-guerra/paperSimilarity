@@ -12,15 +12,14 @@
   import EmbeddingsMatrix from "$lib/components/EmbeddingsMatrix.svelte";
   import MultiAutoSelect from "$lib/components/MultiAutoSelect.svelte";
   import PromiseStatus from "$lib/components/PromiseStatus.svelte";
+  import EmbeddingsProjection from "$lib/components/EmbeddingsProjection.svelte";
 
   import Slider from "$lib/components/Slider.svelte";
   import { setQueryUrl, getDataAuthorLookup, tdMaxHeight } from "$lib/utils";
 
   import { cosineMatrix } from "$lib/cosineSimilarity.js";
-  
-  
-  import { error } from "@sveltejs/kit";
 
+  import { error } from "@sveltejs/kit";
 
   let promise = Promise.resolve([]);
   let promisesAuthors = [];
@@ -34,7 +33,6 @@
   let selectedPapers = [];
   let papers = [];
   let embeddings = null;
-
 
   // we trigger getDataForAllAuthors for limit when the drag is over
   // $: embeddingsSelected && getScoresForAllAuthors();
@@ -57,6 +55,7 @@
           embeddings[key] = newEmbedding[key];
         }
       }
+      console.log("concatenateEmbeddings ", embeddings);
     }
   }
 
@@ -81,7 +80,7 @@
       console.log("getScoresForAllAuthors no authors", authors);
       return;
     }
-    console.log("getScoresForAllAuthors", authors, limit, embeddingsSelected);
+    console.log("🧵🧵 getScoresForAllAuthors embeddings", embeddings);
     papers = [];
     embeddings = {};
     scores = {};
@@ -93,7 +92,6 @@
           embeddingsSelected
         }).then((res) => {
           // scores.set(author.authorId, res.scoresMatrices);
-          console.log("Got lookupAuthor for", author, res);
           papers = papers.concat(
             res.results.papers.map((p) => ({ ...p, authorId: author.authorId }))
           );
@@ -171,83 +169,87 @@
     {:then authors}
       {#if authors?.length === 0}
         <div>No authors found</div>
-      {:else }
-      <h2>Authors found ({authors?.length})</h2>
-      <br />
+      {:else}
+        <h2>Authors found ({authors?.length})</h2>
+        <br />
 
-      <Table
-        data={authors}
-        tableFormat={{
-          name: (name, _, author) =>
-            `<a href="${base}/author/?authorId=${author.authorId}" title="Search for this author">${name}</a><a href="https://www.semanticscholar.org/author/${author.name}/${author.authorId}" title="See in semantic scholar">⤴️</a>`,
-          authorId: (authorId, _, author) =>
-            `<a href="${base}/author/?authorId=${author.authorId}" title="Search for this author">${author.authorId}</a>
+        <Table
+          data={authors}
+          tableFormat={{
+            name: (name, _, author) =>
+              `<a href="${base}/author/?authorId=${author.authorId}" title="Search for this author">${name}</a><a href="https://www.semanticscholar.org/author/${author.name}/${author.authorId}" title="See in semantic scholar">⤴️</a>`,
+            authorId: (authorId, _, author) =>
+              `<a href="${base}/author/?authorId=${author.authorId}" title="Search for this author">${author.authorId}</a>
           <a href="https://www.semanticscholar.org/author/${author.name}/${authorId}" title="See in semantic scholar">⤴️</a>`,
-          papers: (papers) =>
-            `<div style="max-height:10em; overflow:scroll">${papers
-              .map(
-                (paper) =>
-                  `<span class="mx-1"><a href="${base}/papers/?q=${paper.title}">${paper.title}</a></span >`
-              )
-              .join("")}</div>`
-        }}
-        columns={"authorId,name,affiliations,paperCount,citationCount,hIndex,papers".split(",")}
-      ></Table>
+            papers: (papers) =>
+              `<div style="max-height:10em; overflow:scroll">${papers
+                .map(
+                  (paper) =>
+                    `<span class="mx-1"><a href="${base}/papers/?q=${paper.title}">${paper.title}</a></span >`
+                )
+                .join("")}</div>`
+          }}
+          columns={"authorId,name,affiliations,paperCount,citationCount,hIndex,papers".split(",")}
+        ></Table>
 
-      <hr />
+        <hr />
 
-      <h3>Paper comparison for these authors</h3>
-      <div>Here is a comparison of the papers returned for these authors</div>
-      <MultiAutoSelect
-        options={embeddingsOptions}
-        params={{ label: "Embeddings to request:" }}
-        bind:value={embeddingsSelected}
-      />
-      <Slider value={limit} label="Max number of results to show"></Slider>
-      <button class="btn btn-primary" on:click={getScoresForAllAuthors}>Update Comparison</button>
+        <h3>Paper comparison for these authors</h3>
+        <div>Here is a comparison of the papers returned for these authors</div>
+        <MultiAutoSelect
+          options={embeddingsOptions}
+          params={{ label: "Embeddings to request:" }}
+          bind:value={embeddingsSelected}
+        />
+        <Slider value={limit} label="Max number of results to show"></Slider>
+        <button class="btn btn-primary" on:click={getScoresForAllAuthors}>Update Comparison</button>
 
-      <!-- Fetch status -->
-      <div>
-        {#key promisesAuthors}
-          Data requests status:
-          {#each promisesAuthors as p}
-            <PromiseStatus promise={p}></PromiseStatus>
-          {/each}
-        {/key}
-      </div>
-
-      {#key scores?.ProNE?.length}
-        {#if papers && scores}
-          <EmbeddingsMatrix
-            {scores}
-            {papers}
-            method="ProNE"
-            embedding="ProNE"
-            {limit}
-            width={600}
-            bind:selected={selectedPapers}
-          ></EmbeddingsMatrix>
-        {/if}
-      {/key}
-
-      {#key selectedPapers}
-        <div style="height: 600px; overflow: scroll">
-          <Table
-            data={selectedPapers}
-            tableFormat={{
-              title: (t, i, d) => tdMaxHeight(`<a href="${base}/papers/?q=${d.title}" >${t}</a>`),
-              authors: (authors) =>
-                `${tdMaxHeight(authors.map((a) => `<a href="${base}/author/?authorId=${a.authorId}">${a.name}</a>`).join(", "))}`
-            }}
-            columns={["__i", "selected", "title", "year", "citationCount", "authors", "authorId"]}
-          ></Table>
+        <!-- Fetch status -->
+        <div>
+          {#key promisesAuthors}
+            Data requests status:
+            {#each promisesAuthors as p}
+              <PromiseStatus promise={p}></PromiseStatus>
+            {/each}
+          {/key}
         </div>
-      {/key}
-      {/if} 
+
+        {#key scores}
+          {#if papers && scores}
+            <EmbeddingsMatrix
+              {scores}
+              {papers}
+              method="ProNE"
+              embedding="ProNE"
+              {limit}
+              width={600}
+              bind:selected={selectedPapers}
+            ></EmbeddingsMatrix>
+          {/if}
+        {/key}
+
+        {#key selectedPapers}
+          <div style="height: 600px; overflow: scroll">
+            <Table
+              data={selectedPapers}
+              tableFormat={{
+                title: (t, i, d) => tdMaxHeight(`<a href="${base}/papers/?q=${d.title}" >${t}</a>`),
+                authors: (authors) =>
+                  `${tdMaxHeight(authors.map((a) => `<a href="${base}/author/?authorId=${a.authorId}">${a.name}</a>`).join(", "))}`
+              }}
+              columns={["__i", "selected", "title", "year", "citationCount", "authors", "authorId"]}
+            ></Table>
+          </div>
+        {/key}
+
+        {#key papers}
+          {#if embeddings && embeddingsSelected[0] in embeddings && papers}
+            <EmbeddingsProjection embeddings={embeddings[embeddingsSelected[0]]} data={papers}
+            ></EmbeddingsProjection>
+          {/if}
+        {/key}
+      {/if}
       <!-- /if authors.length -->
-
-
-
     {:catch error}
       <p style="color: red">{error.message}</p>
     {/await}
