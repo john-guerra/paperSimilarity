@@ -14,7 +14,7 @@ export async function load({ fetch, url }) {
   }
 
   let res = await fetch(
-    `${SERVER_URL}/api/recommend_authors?id=${CorpusId}&method=ProNE&fields=authorId,citationCount,externalIds,url,name,homepage,hIndex,affiliations,papers.title,papers.externalIds,papers.citationCount&score1=prone,specter,scincl,gnn&score2=prone,specter,scincl,gnn`
+    `${SERVER_URL}/api/recommend_authors?id=${CorpusId}&recommend_method=ProNE&fields=authorId,citationCount,externalIds,url,name,homepage,hIndex,affiliations,papers.title,papers.externalIds,papers.citationCount&score1=prone,specter,scincl,gnn&score2=prone,specter,scincl,gnn`
   );
 
   if (res.ok) {

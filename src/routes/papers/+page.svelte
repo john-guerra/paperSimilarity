@@ -13,7 +13,7 @@
   // import Select from "../../lib/components/Select.svelte";
 
   import Table from "$lib/components/Table.svelte";
-  // import EmbeddingsProjection from "$lib/components/EmbeddingsProjection.svelte";
+  import EmbeddingsProjection from "$lib/components/EmbeddingsProjection.svelte";
 
   // Papers is a reactive variable
   let papers = null;
@@ -39,7 +39,7 @@
     papers = [];
     setQueryUrl($page, { q: query });
 
-    let url = `${SERVER_URL}api/paper_search?query=${query}&limit=${limit}`;
+    let url = `${SERVER_URL}api/paper_search?query=${query}&limit=${limit}&fields=authors,citationCount,externalIds,title,year,embedding.specter_v2`;
 
     console.log("Get papers url", url);
     papers = (await fetch(url).then((res) => res.json())).search_results.map((d) => ({
@@ -87,8 +87,10 @@
     {:else}
       <h2>Papers found ({papers.length})</h2>
 
-      <!-- <EmbeddingsProjection embeddings={papers.map((d) => d.embedding)} data={papers}
-      ></EmbeddingsProjection> -->
+      {#if false && papers.length > 0 && papers[0].embedding?.vector}
+        <EmbeddingsProjection embeddings={papers.map((d) => d?.embedding?.vector)} data={papers}
+        ></EmbeddingsProjection>
+      {/if}
 
       <Table
         data={papers}
